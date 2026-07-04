@@ -195,20 +195,6 @@ print(summary)
 
 ---
 
-# Planned Improvements
-
-- Hybrid Retrieval (BM25 + Dense Retrieval)
-- Cross-Encoder Re-ranking
-- Maximal Marginal Relevance (MMR)
-- Metadata Filtering
-- Persistent FAISS Index
-- Streaming Responses
-- Conversation Memory
-- Source Citation in Responses
-- Docker Support
-
----
-
 # Example Query
 
 **Question**
