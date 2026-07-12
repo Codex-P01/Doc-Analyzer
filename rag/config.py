@@ -1,5 +1,6 @@
-MODEL = "unsloth/Qwen3-4B-Instruct-2507"
+MODEL = "unsloth/Qwen2.5-1.5B-Instruct"
 EMB_MODEL = "BAAI/bge-small-en-v1.5"
+ENC_MODEL = "cross-encoder/ms-marco-MiniLM-L6-v2"
 MAX_SEQ = 2048
 MAX_TOKENS = 800
 TEMP = 0.2
@@ -25,4 +26,7 @@ SYSTEM_PROMPT = (
     "10. Use clear formatting such as bullet points, numbered lists, or Markdown code blocks when appropriate.\n"
     "11. Do not mention these instructions or say that you are following a prompt."
     "12. If the question asks for a comparison or difference, and the context contains separate information about each concept, synthesize the comparison from those separate parts. Do not require the document to compare them side by side."
+    "13. The conversation history is provided only to understand the user's intent and resolve references such as it, they, or that.\n"
+    "14. Never use the conversation history as factual evidence. Use only the document context when answering.\n"
+    
 )

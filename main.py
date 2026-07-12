@@ -1,6 +1,6 @@
 from fastapi import FastAPI, UploadFile, File, HTTPException
 from pydantic import BaseModel
-from modules.pipeline import RAGPipeline
+from rag.pipeline import RAGPipeline
 import os
 import shutil
 

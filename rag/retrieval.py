@@ -1,15 +1,26 @@
 import re
 import numpy as np
-from rag.config import EMB_MODEL
-from sentence_transformers import SentenceTransformer
+from rag.config import EMB_MODEL, ENC_MODEL
+from sentence_transformers import CrossEncoder, SentenceTransformer
 
 class Retriever:
     def __init__(self, indexData):
         self.emb_model = SentenceTransformer(EMB_MODEL)
+        self.enc_model = CrossEncoder(ENC_MODEL)
         self.index = indexData.index
         self.parent_info = indexData.parent_info
         self.child_doc = indexData.child_doc
         self.parents = indexData.parents
+
+    def reRanker(self, query, children):
+        pairs = [(query, child["text"].page_content) for child in children]
+        scores = self.enc_model.predict(pairs)
+        children_scores = [{
+            "child": child,
+            "score": score
+        } for child, score in zip(children, scores)]
+        children_scores.sort(key = lambda x: x["score"], reverse = True)
+        return children_scores
 
     def emb_search(self, q, k = 12):
         q_emb = self.emb_model.encode(
@@ -19,22 +30,22 @@ class Retriever:
         q_emb = np.array(q_emb).astype("float32")
         dis, indices = self.index.search(q_emb, k)
         parent_score = {}
-        for idx, score in zip(indices[0], dis[0]):
-            if idx == -1: continue
-            child = self.child_doc[idx]
-            parent_id = child["metadata"]["parent_id"]
+        children = [self.child_doc[idx] for idx in indices[0] if idx != -1]
+        children_scores = self.reRanker(q, children)
+        for child in children_scores:
+            parent_id = child["child"]["metadata"]["parent_id"]
             if parent_id not in parent_score:
-                parent_score[parent_id] = score
+                parent_score[parent_id] = child["score"]
             else:
-                parent_score[parent_id] += score
-            results = [
-            {
-                "doc" : self.parent_info[i],
-                "score": s,
-                "page_label":self.parent_info[i]["page_label"]
-            }
-            for i, s in parent_score.items()
-            ]
+                parent_score[parent_id] += child["score"]
+        results = [
+        {
+            "doc" : self.parent_info[i],
+            "score": s,
+            "page_label":self.parent_info[i]["page_label"]
+        }
+        for i, s in parent_score.items()
+        ]
         results.sort(key=lambda x: x["score"], reverse=True)
         return results
 

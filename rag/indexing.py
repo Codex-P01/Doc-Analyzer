@@ -6,7 +6,7 @@ from rag.config import (PARENT_CHUNK_SIZE,
                             CHILD_CHUNK_SIZE,
                             CHILD_OVERLAP
                             )
-from modules.preprocessing import Preprocessing
+from rag.preprocessing import Preprocessing
 from sentence_transformers import SentenceTransformer
 from langchain_text_splitters import RecursiveCharacterTextSplitter
 

@@ -16,7 +16,7 @@ class Generator:
         FastLanguageModel.for_inference(self.model)
         self.device = "cuda" if torch.cuda.is_available() else "cpu"
 
-    def build_prompt(self, query, context):
+    def build_prompt(self, query, context, history):
         messages = [
             {
                 "role": "system",
@@ -26,12 +26,14 @@ class Generator:
                 "role": "user",
                 "content":(
                     f"""
-    ### Document Context
-    {context}
-    ### User Question
-    {query}
-    Answer based only on the provided document context.
-    """
+### Conversation History:
+{history}
+### Document Context
+{context}
+### User Question
+{query}
+Answer based only on the provided document context.
+"""
                 ),
             },
         ]
@@ -39,6 +41,42 @@ class Generator:
             messages,
             tokenize=False,
             add_generation_prompt=True,
+        )
+        return prompt
+    
+    def build_query_prompt(self, query, history):
+        message = [
+            {
+                "role": "system",
+                "content": """
+You are a query rewriting assistant.
+
+Your task is to rewrite the user's latest question into a complete, standalone question using only the conversation history.
+
+Rules:
+- Preserve the original meaning.
+- Resolve references such as "it", "they", "this", "those", "these", and similar pronouns.
+- Do not answer the question.
+- Do not introduce information that is not present in the conversation history.
+- If the current question is already complete and unambiguous, return it unchanged.
+- Return only the rewritten question.
+"""
+            },
+            {
+                "role": "user",
+                "content":f"""
+###Conversation History:
+{history}
+
+###Current Question:
+{query}
+"""
+            }
+        ]
+        prompt = self.tokenizer.apply_chat_template(
+            message,
+            tokenize = False,
+            add_generation_prompt = True
         )
         return prompt
 
@@ -96,3 +134,9 @@ class Generator:
         )
         generated = self.generate(prompt)
         return generated
+
+    def rewite_query(self, query, history):
+        if not history: return query
+        prompt = self.build_query_prompt(query, history)
+        output = self.generate(prompt, DO_SAMPLE=False)
+        return output
