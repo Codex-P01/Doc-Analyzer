@@ -1,89 +1,99 @@
 # 📄 Document Analysis RAG System
 
-A Retrieval-Augmented Generation (RAG) system for querying and summarizing PDF documents using Large Language Models (LLMs). The system extracts text from digital and scanned PDFs, builds a semantic search index, retrieves the most relevant document sections, and generates grounded answers based only on the provided document.
+A modular **Retrieval-Augmented Generation (RAG)** system for document question answering and summarization. The system extracts text from digital and scanned PDFs, builds a semantic search index, retrieves the most relevant document sections, and generates grounded answers using a Large Language Model (LLM).
 
 ---
 
 ## ✨ Features
 
-- 📄 PDF text extraction using PyMuPDF
-- 🔍 OCR fallback for scanned PDFs using PaddleOCR
-- 🧹 Automatic document cleaning and normalization
-- 🗑️ Header and footer removal
-- 📚 Parent–Child chunking strategy
-- 🔢 Dense vector embeddings using BAAI BGE
-- ⚡ FAISS vector database for similarity search
-- 🔍 Multi-query retrieval for comparison-style questions
-- 🤖 Answer generation using Qwen 3 4B Instruct
-- 📝 Hierarchical document summarization
-- 🏗️ Modular architecture for easy extension
+* 📄 PDF text extraction using **PyMuPDF**
+* 🔍 OCR fallback for scanned PDFs using **PaddleOCR**
+* 🧹 Document cleaning and normalization
+* 🗑️ Automatic header and footer removal
+* 📚 Parent–Child chunking strategy
+* 🔢 Dense embeddings using **BAAI/bge-small-en-v1.5**
+* ⚡ FAISS vector database for semantic search
+* 🔍 Multi-query retrieval for comparison-based questions
+* 🎯 Cross-Encoder re-ranking for improved retrieval accuracy
+* 💬 Conversation memory for follow-up questions
+* 🔄 Query rewriting for conversational retrieval
+* 🤖 Answer generation using **Qwen3-4B-Instruct**
+* 📝 Hierarchical document summarization
+* 🏗️ Modular and extensible architecture
 
 ---
 
 # Architecture
 
-```
-                    PDF
-                     │
-                     ▼
-           Text Extraction (PyMuPDF)
-                     │
-      ┌──────────────┴──────────────┐
-      │                             │
-Digital PDF                  Scanned PDF
-      │                             │
-      ▼                             ▼
- Direct Text                  PaddleOCR
-      │                             │
-      └──────────────┬──────────────┘
-                     ▼
-             Document Cleaning
-                     ▼
-        Remove Headers / Footers
-                     ▼
-         Parent–Child Chunking
-                     ▼
-        BGE Embedding Generation
-                     ▼
-             FAISS Vector Index
-                     │
-────────────────────────────────────────
-                     │
-              User Question
-                     ▼
-           Multi-Query Expansion
-                     ▼
-             Semantic Retrieval
-                     ▼
-          Parent Context Assembly
-                     ▼
-             Prompt Construction
-                     ▼
-          Qwen 3 4B Instruct LLM
-                     ▼
-            Grounded Answer
+```text
+                     PDF
+                      │
+                      ▼
+         Text Extraction (PyMuPDF)
+                      │
+        ┌─────────────┴─────────────┐
+        │                           │
+   Digital PDF                Scanned PDF
+        │                           │
+        ▼                           ▼
+  Direct Text                 PaddleOCR
+        │                           │
+        └─────────────┬─────────────┘
+                      ▼
+             Text Cleaning
+                      ▼
+      Header / Footer Removal
+                      ▼
+          Parent-Child Chunking
+                      ▼
+          Embedding Generation
+                      ▼
+               FAISS Index
+──────────────────────────────────────────────
+
+                User Question
+                      │
+                      ▼
+          Conversation Memory
+                      ▼
+             Query Rewriting
+                      ▼
+          Multi-Query Expansion
+                      ▼
+        Dense Vector Retrieval
+                      ▼
+        Cross-Encoder Re-ranking
+                      ▼
+       Parent Context Retrieval
+                      ▼
+          Prompt Construction
+                      ▼
+         Qwen3-4B-Instruct LLM
+                      ▼
+          Grounded Response
 ```
 
 ---
 
 # Project Structure
 
-```
+```text
 Document-Analysis-RAG/
 │
-├── main.py                  # FastAPI application
+├── main.py
 ├── requirements.txt
 ├── README.md
 │
 ├── rag/
-│   ├── config.py            # Configuration and constants
-│   ├── pipeline.py          # Main RAG pipeline
-│   ├── preprocessing.py     # PDF processing, OCR, text cleaning
-│   ├── indexing.py          # Chunking, embeddings, FAISS indexing
-│   ├── retrieval.py         # Query expansion and semantic retrieval
-│   └── generation.py        # Prompt construction, LLM inference, summarization
+│   ├── config.py
+│   ├── pipeline.py
+│   ├── preprocessing.py
+│   ├── indexing.py
+│   ├── retrieval.py
+│   ├── generation.py
+│   └── memory.py
 │
-└── uploads/                 # Uploaded PDF documents
+└── uploads/
 ```
 
 ---
@@ -91,32 +101,65 @@ Document-Analysis-RAG/
 # Retrieval Pipeline
 
 1. Load PDF document
-2. Extract text (OCR when necessary)
-3. Clean and normalize document text
-4. Remove repeated headers and footers
-5. Create parent chunks
-6. Create child chunks
+2. Extract text using PyMuPDF
+3. Apply OCR for scanned pages when required
+4. Clean and normalize extracted text
+5. Remove repeated headers and footers
+6. Create parent and child chunks
 7. Generate dense embeddings
-8. Build FAISS index
-9. Expand user query (for comparison questions)
-10. Retrieve relevant parent contexts
-11. Construct prompt
-12. Generate answer using the LLM
+8. Build the FAISS vector index
+9. Rewrite conversational queries using chat history
+10. Expand comparison-based queries
+11. Retrieve relevant child chunks
+12. Re-rank retrieved chunks using a Cross-Encoder
+13. Aggregate relevant parent chunks
+14. Construct the final prompt
+15. Generate the answer using Qwen3-4B-Instruct
 
 ---
 
 # Technologies Used
 
-| Component | Technology |
-|----------|------------|
-| LLM | Qwen3-4B-Instruct |
-| Framework | Unsloth |
-| OCR | PaddleOCR |
-| PDF Processing | PyMuPDF |
-| Embeddings | BAAI/bge-small-en-v1.5 |
-| Vector Database | FAISS |
-| Chunking | LangChain RecursiveCharacterTextSplitter |
-| Backend | FastAPI *(in progress)* |
+| Component       | Technology                               |
+| --------------- | ---------------------------------------- |
+| LLM             | Qwen3-4B-Instruct                        |
+| Framework       | Unsloth                                  |
+| OCR             | PaddleOCR                                |
+| PDF Processing  | PyMuPDF                                  |
+| Embedding Model | BAAI/bge-small-en-v1.5                   |
+| Re-ranking      | CrossEncoder                             |
+| Vector Database | FAISS                                    |
+| Chunking        | LangChain RecursiveCharacterTextSplitter |
+| Backend         | FastAPI                                  |
+
+---
+
+# Prerequisites
+
+Before installing the project, ensure your environment satisfies the following requirements.
+
+## Python
+
+* **Python 3.11 or below**
+* Python 3.12+ is currently **not supported** due to dependency compatibility.
+
+## GPU (Recommended)
+
+* NVIDIA GPU with CUDA support is recommended for faster inference.
+
+## PyTorch
+
+After installing the project requirements, install the correct **PyTorch** version for your CUDA installation.
+
+For example, for **CUDA 12.1**:
+
+```bash
+pip install torch torchvision torchaudio --index-url https://download.pytorch.org/whl/cu121
+```
+
+For other CUDA versions, refer to the official PyTorch installation guide:
+
+https://pytorch.org/get-started/locally/
 
 ---
 
@@ -125,73 +168,95 @@ Document-Analysis-RAG/
 Clone the repository
 
 ```bash
-git clone https://github.com/Codex-P01/Doc-Analyzer.git
+git clone https://github.com/<your-username>/<repository>.git
 
-cd Doc-Analyzer
+cd <repository>
 ```
 
-# Prerequisites
-
-Before installing the project, ensure your environment meets the following requirements:
-
-- **Python 3.11 or below**
-  - Python 3.12+ is **not currently supported** due to compatibility issues with some dependencies.
-
-- **NVIDIA GPU (recommended)**
-  - CUDA-compatible GPU is recommended for inference.
-
-- **PyTorch**
-  - After installing the project requirements, install the appropriate **PyTorch** version that matches your CUDA version.
-  - Refer to the official PyTorch installation guide:
-    https://pytorch.org/get-started/locally/
-
----
-
-Install dependencies
+Install the project dependencies
 
 ```bash
 pip install -r requirements.txt
 ```
 
+Install the appropriate PyTorch version for your CUDA environment.
+
 ---
 
-# Usage
+# Running the API
 
-Build the document index
+Start the FastAPI server using Uvicorn:
 
-```python
-rag.index_pdf("document.pdf")
+```bash
+uvicorn main:app --host 0.0.0.0 --port 8000
 ```
 
-Ask questions
+If the server starts successfully, you should see output similar to:
 
-```python
-response = rag.query(
-    "Explain the Mamdani Fuzzy Inference System."
-)
-
-print(response["answer"])
+```text
+INFO:     Uvicorn running on http://127.0.0.1:8000
 ```
 
-Generate a document summary
+---
 
-```python
-summary = rag.summarize()
+## API Documentation
 
-print(summary)
+FastAPI automatically generates interactive API documentation.
+
+* **Swagger UI**
+
 ```
+http://127.0.0.1:8000/docs
+```
+
+* **ReDoc**
+
+```
+http://127.0.0.1:8000/redoc
+```
+
+---
+
+## Typical Workflow
+
+1. Start the FastAPI server.
+2. Open the Swagger UI (`/docs`).
+3. Upload a PDF document using the upload endpoint.
+4. Ask questions about the uploaded document using the query endpoint.
+5. Generate a document summary using the summary endpoint.
+
+---
+
+## Example
+
+Run the server:
+
+```bash
+uvicorn main:app --reload
+```
+
+Open your browser and navigate to:
+
+```
+http://127.0.0.1:8000/docs
+```
+
+From there, you can test all available API endpoints directly from the interactive interface.
 
 ---
 
 # Current Features
 
-- ✅ Digital PDF support
-- ✅ Scanned PDF support
-- ✅ OCR fallback
-- ✅ Parent–Child Retrieval
-- ✅ Multi-query Retrieval
-- ✅ Hierarchical Summarization
-- ✅ Modular RAG Pipeline
+* ✅ Digital PDF support
+* ✅ Scanned PDF support
+* ✅ OCR fallback
+* ✅ Parent–Child Retrieval
+* ✅ Multi-query Retrieval
+* ✅ Cross-Encoder Re-ranking
+* ✅ Conversational Memory
+* ✅ Query Rewriting
+* ✅ Hierarchical Summarization
+* ✅ Modular RAG Pipeline
 
 ---
 
@@ -199,43 +264,63 @@ print(summary)
 
 **Question**
 
-```
+```text
 What is the difference between Competitive Learning and Hebbian Learning?
 ```
 
 **Pipeline**
 
-```
+```text
 Question
-      │
-      ▼
-Query Expansion
-      ▼
-Semantic Retrieval
-      ▼
-Relevant Parent Chunks
-      ▼
+     │
+     ▼
+Conversation Memory
+     ▼
+Query Rewriting
+     ▼
+Multi-Query Expansion
+     ▼
+Dense Retrieval
+     ▼
+Cross-Encoder Re-ranking
+     ▼
+Parent Context
+     ▼
 Prompt Construction
-      ▼
+     ▼
 LLM
-      ▼
+     ▼
 Answer
 ```
 
 ---
 
+# Compatibility
+
+| Component        | Requirement              |
+| ---------------- | ------------------------ |
+| Python           | ≤ 3.11                   |
+| GPU              | NVIDIA GPU (Recommended) |
+| CUDA             | Supported                |
+| Operating System | Windows / Linux          |
+
+---
+
 # License
 
-This project is licensed under the MIT License.
+This project is released under the **MIT License**.
 
 ---
 
 # Acknowledgements
 
-- Unsloth
-- Qwen
-- PaddleOCR
-- PyMuPDF
-- Sentence Transformers
-- FAISS
-- LangChain
+This project makes use of the following open-source projects:
+
+* Unsloth
+* Qwen
+* PaddleOCR
+* PyMuPDF
+* Sentence Transformers
+* FAISS
+* LangChain
+* FastAPI
