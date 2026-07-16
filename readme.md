@@ -141,7 +141,7 @@ Before installing the project, ensure your environment satisfies the following r
 ## Python
 
 * **Python 3.11 or below**
-* Python 3.12+ is currently **not supported** due to dependency compatibility.
+* Python 3.12+ is **not currently supported** due to dependency compatibility.
 
 ## GPU (Recommended)
 
@@ -149,7 +149,7 @@ Before installing the project, ensure your environment satisfies the following r
 
 ## PyTorch
 
-After installing the project requirements, install the correct **PyTorch** version for your CUDA installation.
+If you are running the project locally (without Docker), install the appropriate **PyTorch** version for your CUDA installation after installing the project requirements.
 
 For example, for **CUDA 12.1**:
 
@@ -157,15 +157,17 @@ For example, for **CUDA 12.1**:
 pip install torch torchvision torchaudio --index-url https://download.pytorch.org/whl/cu121
 ```
 
-For other CUDA versions, refer to the official PyTorch installation guide:
+For other CUDA versions, visit:
 
 https://pytorch.org/get-started/locally/
 
+> **Note:** If you are using Docker, PyTorch is already included in the provided Docker image and no additional installation is required.
+
 ---
 
-# Installation
+# Installation (Local)
 
-Clone the repository
+Clone the repository:
 
 ```bash
 git clone https://github.com/<your-username>/<repository>.git
@@ -173,57 +175,98 @@ git clone https://github.com/<your-username>/<repository>.git
 cd <repository>
 ```
 
-Install the project dependencies
+Install the project dependencies:
 
 ```bash
 pip install -r requirements.txt
 ```
 
-Install the appropriate PyTorch version for your CUDA environment.
+Install the correct PyTorch version for your CUDA installation.
 
 ---
 
-# Running the API
+# Running the API (Local)
 
-Start the FastAPI server using Uvicorn:
+Start the FastAPI server:
 
 ```bash
-uvicorn main:app --host 0.0.0.0 --port 8000
+uvicorn main:app --host 0.0.0.0 --port 8080 --reload
 ```
 
-If the server starts successfully, you should see output similar to:
+Once the server is running, open:
 
-```text
-INFO:     Uvicorn running on http://127.0.0.1:8000
-```
-
----
-
-## API Documentation
-
-FastAPI automatically generates interactive API documentation.
-
-* **Swagger UI**
+**Swagger UI**
 
 ```
-http://127.0.0.1:8000/docs
+http://127.0.0.1:8080/docs
 ```
 
-* **ReDoc**
+**ReDoc**
 
 ```
-http://127.0.0.1:8000/redoc
+http://127.0.0.1:8080/redoc
 ```
 
 ---
 
-## Typical Workflow
+# Running with Docker
 
-1. Start the FastAPI server.
-2. Open the Swagger UI (`/docs`).
-3. Upload a PDF document using the upload endpoint.
-4. Ask questions about the uploaded document using the query endpoint.
-5. Generate a document summary using the summary endpoint.
+## Build the Docker image
+
+```bash
+docker build -t document-analysis-rag .
+```
+
+## Run the container
+
+```bash
+docker run --gpus all -p 8080:8080 document-analysis-rag
+```
+
+If your system does not support GPU acceleration, you can omit the `--gpus all` flag:
+
+```bash
+docker run -p 8080:8080 document-analysis-rag
+```
+
+Once the container is running, access the API at:
+
+```
+http://localhost:8080/docs
+```
+
+or
+
+```
+http://localhost:8080/redoc
+```
+
+---
+
+# Docker Image
+
+The provided Docker image includes:
+
+* Python with PyTorch 2.6.0
+* CUDA 12.4 Runtime
+* cuDNN 9
+* FastAPI
+* Uvicorn
+* All project dependencies
+* OpenCV system libraries
+* PaddleOCR dependencies
+
+No additional setup is required other than building and running the container.
+
+---
+
+# Typical Workflow
+
+1. Start the API (locally or using Docker).
+2. Open the Swagger UI.
+3. Upload a PDF document.
+4. Ask questions about the uploaded document.
+5. Generate a summary of the document.
 
 ---
 

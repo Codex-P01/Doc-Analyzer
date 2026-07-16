@@ -1,6 +1,6 @@
 from paddleocr import PaddleOCR
 import re
-import fitz
+import pymupdf
 import cv2
 import unicodedata
 import numpy as np
@@ -14,7 +14,7 @@ class Preprocessing:
         )
     def process_pdf(self, path: str) -> list[Document]:
         document = []
-        with fitz.open(path) as pdf:
+        with pymupdf.open(path) as pdf:
             for page_num, page in enumerate(pdf):
                 text = page.get_text().strip()
                 if len(text) < 50:
