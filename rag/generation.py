@@ -1,5 +1,4 @@
 import torch
-from unsloth import FastLanguageModel
 from rag.config import (MODEL,
                 MAX_SEQ,
                 TEMP,
@@ -8,6 +7,7 @@ from rag.config import (MODEL,
                 )
 class Generator:
     def __init__(self):
+        from unsloth import FastLanguageModel
         self.model, self.tokenizer = FastLanguageModel.from_pretrained(
         model_name = MODEL,
         max_seq_length = MAX_SEQ,

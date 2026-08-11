@@ -29,6 +29,7 @@ langchain-huggingface
 
 # LLM
 unsloth
+torch
 
 # Common packages
 numpy<2
