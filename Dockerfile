@@ -2,7 +2,6 @@ FROM pytorch/pytorch:2.6.0-cuda12.4-cudnn9-runtime
 
 WORKDIR /app
 
-# Install system libraries required by OpenCV/PaddleOCR
 RUN apt-get update && apt-get install -y \
     libgl1 \
     libglib2.0-0 \
@@ -11,9 +10,11 @@ RUN apt-get update && apt-get install -y \
     ffmpeg \
     && rm -rf /var/lib/apt/lists/*
 
-COPY . .
+COPY requirements.txt .
 
 RUN pip install --no-cache-dir -r requirements.txt
+
+COPY . .
 
 EXPOSE 8080
 

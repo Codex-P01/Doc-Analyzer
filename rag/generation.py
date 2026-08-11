@@ -16,6 +16,27 @@ class Generator:
         FastLanguageModel.for_inference(self.model)
         self.device = "cuda" if torch.cuda.is_available() else "cpu"
 
+    def count_tokens(self, text):
+        return len(
+            self.tokenizer(
+                text,
+                add_special_tokens=False
+            )["input_ids"]
+        )
+
+    def select_parent(self, results, max_token_set = 1100):
+        selected = []
+        curr_token_set = 0
+        for result in results:
+            doc_tokens = self.count_tokens(
+                result["doc"]["page_content"]
+            )
+            if curr_token_set + doc_tokens > max_token_set:
+                continue
+            curr_token_set += doc_tokens
+            selected.append(result)
+        return selected
+
     def build_prompt(self, query, context, history):
         messages = [
             {
@@ -135,7 +156,7 @@ Rules:
         generated = self.generate(prompt)
         return generated
 
-    def rewite_query(self, query, history):
+    def rewrite_query(self, query, history):
         if not history: return query
         prompt = self.build_query_prompt(query, history)
         output = self.generate(prompt, DO_SAMPLE=False)

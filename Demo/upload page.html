@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <link rel="stylesheet" href="style.css">
+        <title>Upload Page</title>
+    </head>
+    <body>
+        <main class="upload-container">
+            <h1>Upload File</h1>
+            <p class="description">
+                Select a PDF file to continue.
+            </p>
+            <div class="upload-section">
+                <label for="file" class="file-label">
+                    Choose PDF
+                </label>
+                <input
+                    id="file"
+                    type="file"
+                    accept=".pdf,application/pdf"
+                >
+                <p id="file-name">No file selected</p>
+                <button id="btn" type="button">
+                    Continue
+                </button>
+                <div id = "loader">
+                    <div class="loader-container">
+                        <div class="spinner"></div>
+                        <h2>Uploading...</h2>
+                        <p>Please wait while we process your file.</p>
+                    </div>
+                </div>
+                <div class = "popup-success">
+                    <p id="popup-text-success"></p>
+                    <button id="next-btn" type="button">Next</button>
+                </div>
+                <div class = "popup-failed">
+                    <p id="popup-text-failed"></p>
+                    <button id="close-btn" type="button">Close</button>
+                </div>
+            </div>
+        </main>
+        <script src="upload.js"></script>
+    </body>
+</html>

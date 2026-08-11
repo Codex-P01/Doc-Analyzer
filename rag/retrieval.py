@@ -4,9 +4,11 @@ from rag.config import EMB_MODEL, ENC_MODEL
 from sentence_transformers import CrossEncoder, SentenceTransformer
 
 class Retriever:
-    def __init__(self, indexData):
-        self.emb_model = SentenceTransformer(EMB_MODEL)
-        self.enc_model = CrossEncoder(ENC_MODEL)
+    def __init__(self, indexData, emb_model = None, enc_model = None):
+        self.emb_model = (emb_model if emb_model is not None
+                          else SentenceTransformer(EMB_MODEL))
+        self.enc_model = (enc_model if enc_model is not None
+                          else CrossEncoder(ENC_MODEL))
         self.index = indexData.index
         self.parent_info = indexData.parent_info
         self.child_doc = indexData.child_doc
@@ -62,6 +64,7 @@ class Retriever:
             match = re.search(pattern, q, flags=re.IGNORECASE)
             if match:
                 items = re.split(r",\s*|\s+and\s+|\s+vs\.?\s+|\s+versus\.?\s+", match.group(1))
+                items = [item.strip() for item in items]
                 return items
         return None
 
@@ -79,7 +82,7 @@ class Retriever:
                 ])
         return list(dict.fromkeys(expanded))
 
-    def retrieve_multi_query(self, query, k_per_query=6, final_k=6):
+    def retrieve_multi_query(self, query, k_per_query=6, final_k=4):
         merged = {}
         for expanded_query in self.expand_query(query):
             results = self.emb_search(expanded_query, k=k_per_query)

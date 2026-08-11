@@ -1,11 +1,11 @@
 import faiss
 import numpy as np
 from rag.config import EMB_MODEL
-from rag.config import (PARENT_CHUNK_SIZE,
+from rag.config import (    PARENT_CHUNK_SIZE,
                             PARENT_OVERLAP,
                             CHILD_CHUNK_SIZE,
                             CHILD_OVERLAP
-                            )
+                        )
 from rag.preprocessing import Preprocessing
 from sentence_transformers import SentenceTransformer
 from langchain_text_splitters import RecursiveCharacterTextSplitter
@@ -18,9 +18,10 @@ class IndexData:
         self.parents = []
 
 class Indexer:
-    def __init__(self):
+    def __init__(self, emb_model = None):
         self.preprocessing = Preprocessing()
-        self.emb_model = SentenceTransformer(EMB_MODEL)
+        self.emb_model = (emb_model if emb_model is not None
+                          else SentenceTransformer(EMB_MODEL))
         self.parent_splitter = RecursiveCharacterTextSplitter(
             chunk_size = PARENT_CHUNK_SIZE,
             chunk_overlap = PARENT_OVERLAP,

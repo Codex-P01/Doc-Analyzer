@@ -1,11 +1,21 @@
 from fastapi import FastAPI, UploadFile, File, HTTPException
 from pydantic import BaseModel
 from rag.pipeline import RAGPipeline
+from fastapi.middleware.cors import CORSMiddleware
 import os
 import shutil
 
 app = FastAPI(title = "RAG API")
 rag = RAGPipeline()
+
+origins = ["*"]
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins = origins,
+    allow_credentials = True,
+    allow_methods = ["*"],
+    allow_headers = ["*"],
+)
 
 class Query(BaseModel):
     query: str
@@ -18,7 +28,7 @@ os.makedirs(UPLOAD_DIR, exist_ok=True)
 
 @app.get("/")
 def home():
-    return {"message": "Welcome to the RAG API. Use /upload to upload a PDF and /query to ask questions."}  
+    return {"message": "Welcome to the RAG API. Use /upload to upload a PDF and /query to ask questions."}
 
 @app.get("/status")
 def status():

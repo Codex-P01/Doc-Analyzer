@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <link rel="stylesheet" href="chat-style.css">
+        <title>Chat Page</title>
+    </head>
+    <body>
+        <div class="chat-container">
+            <div class="chat-header">
+                <button id="back-btn" type="button">
+                    ← Back
+                </button>
+                <div class="header-text">
+                    <h1>Chat</h1>
+                    <p>Ask questions about your PDF</p>
+                </div>
+                <button id="summary-btn" type="button">
+                    Summary
+                </button>
+            </div>
+            <div class = "popup-summary">
+                <h1 id = "sum">SUMMARY</h1>
+                <p id = "popup-text-summary"></p>
+                <button id = "close-btn">
+                    Close
+                </button>
+            </div>
+            <div id="chat-messages">
+                <div class="message bot-message">
+                    <p>Your PDF is ready. Ask me a question!</p>
+                </div>
+            </div>
+            <div class="input-container">
+                <input
+                    type="text"
+                    id="message"
+                    placeholder="Enter your message..."
+                    autocomplete="off"
+                >
+                <button id="send-btn" type="button">
+                    Send
+                </button>
+                <div id = "loader">
+                    <div class="loader-container">
+                        <div class="spinner"></div>
+                        <h2 id = "head-text"></h2>
+                        <p id = "para-text"></p>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <script src="chat.js"></script>
+    </body>
+</html>

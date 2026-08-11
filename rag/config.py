@@ -1,8 +1,8 @@
 MODEL = "unsloth/Qwen2.5-1.5B-Instruct"
 EMB_MODEL = "BAAI/bge-small-en-v1.5"
 ENC_MODEL = "cross-encoder/ms-marco-MiniLM-L6-v2"
-MAX_SEQ = 2048
-MAX_TOKENS = 800
+MAX_SEQ = 3048
+MAX_TOKENS = 500
 TEMP = 0.2
 PARENT_CHUNK_SIZE = 1000
 PARENT_OVERLAP = 200

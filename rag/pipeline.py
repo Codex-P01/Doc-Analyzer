@@ -4,10 +4,13 @@ from rag.generation import Generator
 from rag.memory import ChatMemory
 
 class RAGPipeline:
-    def __init__(self):
-        self.indexer = Indexer()
-        self.generator = Generator()
-        self.chatmemory = ChatMemory()
+    def __init__(self, indexer = None, generator = None, chatmemory = None):
+        self.indexer = (indexer if indexer is not None
+                        else Indexer())
+        self.generator = (generator if generator is not None
+                          else Generator())
+        self.chatmemory = (chatmemory if chatmemory is not None
+                           else ChatMemory(self.generator.tokenizer))
         self.indexData = None
         self.retriever = None
 
@@ -19,8 +22,9 @@ class RAGPipeline:
         if self.retriever is None:
             raise RuntimeError("No document has been indexed")
         history = self.chatmemory.getHistory()
-        rewrittenQuestion = self.generator.rewite_query(question, history)
+        rewrittenQuestion = self.generator.rewrite_query(question, history)
         results = self.retriever.retrieve_multi_query(rewrittenQuestion)
+        results = self.generator.select_parent(results)
         context = ""
         for result in results:
             context += f"""

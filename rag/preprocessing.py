@@ -7,12 +7,13 @@ import numpy as np
 from langchain_core.documents import Document
 
 class Preprocessing:
-    def __init__(self):
-        self.ocr = PaddleOCR(
-            use_doc_orientation_classify=True,
-            lang="en"
-        )
-    def process_pdf(self, path: str) -> list[Document]:
+    def __init__(self, ocr = None):
+        self.ocr = (ocr if ocr is not None
+                    else PaddleOCR(
+                    use_doc_orientation_classify=True,
+                    lang="en"
+                ))
+    def process_pdf(self, path: str):
         document = []
         with pymupdf.open(path) as pdf:
             for page_num, page in enumerate(pdf):
@@ -54,7 +55,6 @@ class Preprocessing:
             cleanned_text[i] = cleanned_text[i].replace("\r", "\n")
             cleanned_text[i] = re.sub(r"[ \t]+", " ", cleanned_text[i])
             cleanned_text[i] = re.sub(r"^\s*Page\s+\d+\s*$", "", cleanned_text[i], flags=re.MULTILINE)
-            cleanned_text[i] = re.sub(r"^\s*\d+\s*/\s*\d+\s*$", "", cleanned_text[i], flags=re.MULTILINE)
             cleanned_text[i] = re.sub(r"^\s*\d+(\.\d+)?\s*$", "", cleanned_text[i], flags=re.MULTILINE)
             cleanned_text[i] = re.sub(
                 r"\b\d{1,2}/\d{1,2}/\d{2,4}\s+\d{1,2}:\d{2}(?::\d{2})?\s*(AM|PM)?\b",
