@@ -1,24 +1,25 @@
 name: Continuous Integration
+
 on:
-    push:
-        branches: [main]
-    pusll_request:
-job:
-    test:
-        runs-on: ubuntu-latest
+  push:
+    branches: [main]
+  pull_request:
 
-        steps:
-            - name: Checkout Code
-              uses: actions/checkout@v4
+jobs:
+  test:
+    runs-on: ubuntu-latest
 
-            - name: Setup Python
-              uses: actions/setup-python@v5
-              with:
-                python-version: "3.11"
-            
-            - name: Install Dependencies
-              run: pip install -r requirements.tst
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
 
-            - name: Run Tests
-              run: pytest
-              
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Install Dependencies
+        run: pip install -r requirements.txt
+
+      - name: Run Tests
+        run: pytest
